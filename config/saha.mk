@@ -11,20 +11,20 @@ FEED:=        $(OPENWRT_AA)/scripts/feeds
 %.s-top-package: %.package
 	@echo Enable $(PKG) in .config;
 	@sed "s/.*CONFIG_\([A-Z]\+\)_$(PKG) .*/CONFIG_\1_$(PKG)=y/" $(OWRT_CONFIG) > $(OWRT_CONFIG).sv; \
-		mv $(OWRT_CONFIG){.sv,}
+		mv $(OWRT_CONFIG).sv $(OWRT_CONFIG)
 	@$(FEED) update -i &> /dev/null
 
 %.set-config: PKG=$(subst .set-config,,$@)
 %.set-config: %.package
 	@echo Enable $(PKG) in .config
 	@sed "s/.*CONFIG_$(PKG) .*/CONFIG_$(PKG)=y/" $(OWRT_CONFIG) > $(OWRT_CONFIG).sv; \
-		mv $(OWRT_CONFIG){.sv,}
+		mv $(OWRT_CONFIG).sv $(OWRT_CONFIG)
 
 %.spackage: PKG=$(subst .spackage,,$@)
 %.spackage: %.package
 	@echo Enable $(PKG) in .config
 	@sed "s/.*CONFIG_\([A-Z]\+\)_$(PKG) .*/CONFIG_\1_$(PKG)=y/" $(OWRT_CONFIG) > $(OWRT_CONFIG).sv; \
-		mv $(OWRT_CONFIG){.sv,}
+		mv $(OWRT_CONFIG).sv $(OWRT_CONFIG)
 
 # MESH_BSSD_ID.set-cfg-value: ID=MESH-802.11P
 %.set-cfg-value: PKG=$(subst .set-cfg-value,,$@)
@@ -32,35 +32,35 @@ FEED:=        $(OPENWRT_AA)/scripts/feeds
 	$(if $ID,,$(error ID variable must be set in order to update .config settings))
 	@echo Set $(PKG) to $(ID)
 	@sed "s/.*CONFIG_$(PKG)[^_]*/CONFIG_$(PKG)=$(ID)/" $(OWRT_CONFIG) > $(OWRT_CONFIG).sv; \
-		mv $(OWRT_CONFIG){.sv,}
+		mv $(OWRT_CONFIG).sv $(OWRT_CONFIG)
 
 #.dpackage target sets feature to 'is not set' state
 %.d-top-package: PKG=$(subst .d-top-package,,$@)
 %.d-top-package: %.package
 	@echo Set $(PKG) to disabled in .config
 	@sed "s/CONFIG_\([A-Z]\+\)_$(PKG)=y/# CONFIG_\1_$(PKG) is not set/" $(OWRT_CONFIG) > $(OWRT_CONFIG).sv; \
-		mv $(OWRT_CONFIG){.sv,};
+		mv $(OWRT_CONFIG).sv $(OWRT_CONFIG);
 	@$(FEED) update -i &> /dev/null
 
 %.dpackage: PKG=$(subst .dpackage,,$@)
 %.dpackage: %.package
 	@echo Set $(PKG) to disabled in .config
 	@sed "s/CONFIG_\([A-Z]\+\)_$(PKG)=y/# CONFIG_\1_$(PKG) is not set/" $(OWRT_CONFIG) > $(OWRT_CONFIG).sv; \
-		mv $(OWRT_CONFIG){.sv,};
+		mv $(OWRT_CONFIG).sv $(OWRT_CONFIG);
 
 
 %.unset-config: PKG=$(subst .unset-config,,$@)
 %.unset-config: %.package
 	@echo Set $(PKG) to disabled in .config
 	@sed "s/CONFIG_$(PKG)=y/# CONFIG_$(PKG) is not set/" $(OWRT_CONFIG) > $(OWRT_CONFIG).sv; \
-		mv $(OWRT_CONFIG){.sv,};
+		mv $(OWRT_CONFIG).sv $(OWRT_CONFIG);
 
 #installs package
 %.ipackage: PKG=$(subst .ipackage,,$@)
 %.ipackage: %.package
 	@echo [PKG] installing $(PKG);
 	@sed /CONFIG_PACKAGE_$(PKG)\=/d $(OWRT_CONFIG) > $(OWRT_CONFIG).sv; \
-		mv $(OWRT_CONFIG){.sv,}
+		mv $(OWRT_CONFIG).sv $(OWRT_CONFIG)
 	@$(FEED) install -d y $(PKG) &> packages.log
 
 #uninstall package
