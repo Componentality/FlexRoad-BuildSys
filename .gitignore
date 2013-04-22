@@ -2,3 +2,4 @@ saha-dist/
 *.log
 out/
 _dirty_patches_/
+.defaults
