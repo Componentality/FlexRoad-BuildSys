@@ -26,7 +26,7 @@ git_get_branch() {
 	local remote="$2"
 
 	cd $path &> /dev/null
-	git branch -r | grep -v $remote | sed "s/^\s\+[^\/]\+\/\(.*\)/\1/"
+	git branch -r | grep $remote | sed "s/^\s\+[^\/]\+\/\(.*\)/\1/"
 	cd - &> /dev/null
 }
 
@@ -68,6 +68,22 @@ update_config() {
 	mv $tmp $DEFAULTS
 }
 
+git_branch_exists() {
+	local path="$1"
+	local remote=$2
+	local branch=$3
+
+	local out=1 # not exists
+
+	cd "$path"
+	if git config -l | grep "branch.$branch.remote=$remote" &> /dev/null; then
+		out=0
+	fi
+	cd - &> /dev/null
+
+	return $out
+}
+
 # Usage:
 
 TARGETS=`ls -1 config-*.mk | sed -e "s/config-\(.*\).mk/\1/"`
@@ -107,7 +123,7 @@ case $1 in
 	getbranch)
 		echo $BRANCH
 		;;
-	branches)
+	listbranches)
 		git_get_allowed_branches $REMOTE
 		;;
 	setbranch)
@@ -119,20 +135,30 @@ case $1 in
 		fi
 		;;
 	switch)
+		for path in "$FR_BS_PATH" "$FR_PK_PATH" "$FR_PATH"; do
+			git_branch_exists $path $REMOTE $BRANCH
+			cd $path
+			if [ $? -eq 1 ]; then
+				git checkout -b $BRANCH $REMOTE/$BRANCH
+			else
+				git checkout $BRANCH
+			fi
+			cd - &> /dev/null
+		done
 		;;
 	gettarget)
 		echo $TARGET
 		;;
-	target)
+	listtargets)
+		echo $TARGETS
+		;;
+	settarget)
 		if echo $TARGETS | tr ' ' '\n' | grep -E "^$2$" &> /dev/null; then
 			TARGET=$2
 			update_config
 		else
 			echo Unknown target "'"$2"'"
 		fi
-		;;
-	checkout)
-		echo "... not implemented yet ..."
 		;;
 	tag)
 		echo tag current configuration [$REMOTE/$BRANCH/$TARGET/$BUILD_ID]
