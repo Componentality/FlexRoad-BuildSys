@@ -31,10 +31,10 @@ git_get_branch() {
 }
 
 git_get_allowed_remote() {
-	_FIN_=`mktemp`
-	TMP_BS=`mktemp`; git_get_remote $FR_BS_PATH | sort > $TMP_BS
-	TMP_PK=`mktemp`; git_get_remote $FR_PK_PATH | sort > $TMP_PK
-	TMP_FR=`mktemp`; git_get_remote $FR_PATH | sort > $TMP_FR
+	_FIN_=`mktemp tmp.XXXXXXXXXX`
+	TMP_BS=`mktemp tmp.XXXXXXXXXX`; git_get_remote $FR_BS_PATH | sort > $TMP_BS
+	TMP_PK=`mktemp tmp.XXXXXXXXXX`; git_get_remote $FR_PK_PATH | sort > $TMP_PK
+	TMP_FR=`mktemp tmp.XXXXXXXXXX`; git_get_remote $FR_PATH | sort > $TMP_FR
 	comm -1 -2 $TMP_BS $TMP_PK &> $_FIN_
 	comm -1 -2 $TMP_FR $_FIN_
 	rm -f $TMP_BS $TMP_PK $_FIN_ $TMP_FR
@@ -43,10 +43,10 @@ git_get_allowed_remote() {
 git_get_allowed_branches() {
 	local remote=$1
 
-	_FIN_=`mktemp`
-	TMP_BS=`mktemp`; git_get_branch $FR_BS_PATH $remote | sort > $TMP_BS
-	TMP_PK=`mktemp`; git_get_branch $FR_PK_PATH $remote | sort > $TMP_PK
-	TMP_FR=`mktemp`; git_get_branch $FR_PATH $remote | sort > $TMP_FR
+	_FIN_=`mktemp tmp.XXXXXXXXXX`
+	TMP_BS=`mktemp tmp.XXXXXXXXXX`; git_get_branch $FR_BS_PATH $remote | sort > $TMP_BS
+	TMP_PK=`mktemp tmp.XXXXXXXXXX`; git_get_branch $FR_PK_PATH $remote | sort > $TMP_PK
+	TMP_FR=`mktemp tmp.XXXXXXXXXX`; git_get_branch $FR_PATH $remote | sort > $TMP_FR
 
 	comm -1 -2 $TMP_BS $TMP_PK &> $_FIN_
 	comm -1 -2 $TMP_FR $_FIN_
@@ -54,7 +54,7 @@ git_get_allowed_branches() {
 }
 
 update_config() {
-	local tmp=`mktemp`
+	local tmp=`mktemp tmp.XXXXXXXXXX`
 
 	if [ -e $DEFAULTS ]; then
 		rm $DEFAULTS
